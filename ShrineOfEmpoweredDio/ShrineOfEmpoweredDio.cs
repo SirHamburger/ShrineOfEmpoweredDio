@@ -28,7 +28,7 @@ namespace ShrineOfEmpoweredDio
         public int clientCost = UNINITIALIZED;
         public bool isBalancedMode = true;
 
-        private int useCount = 0;
+        private int useCount = 1;
 
 
         public void Awake()
@@ -38,8 +38,13 @@ namespace ShrineOfEmpoweredDio
 
             On.RoR2.SceneDirector.PopulateScene += (orig, self) =>
             {
+
                 orig(self);
+                if(RoR2.SceneInfo.instance.sceneDef.stageOrder == 5)
                 SpawnShrineOfDio(self);
+                
+
+                
 
             };
 
@@ -89,22 +94,16 @@ namespace ShrineOfEmpoweredDio
                 PurchaseInteraction pi = self.GetFieldValue<PurchaseInteraction>("purchaseInteraction");
                 pi.contextToken = "Offer to the Shrine of Dio";
                 pi.displayNameToken = "Shrine of Dio";
-                self.costMultiplierPerPurchase = 1f;
+                self.costMultiplierPerPurchase = 4f;
 
 
                 isBalancedMode = UseBalancedMode.Value;
-                if (UseBalancedMode.Value)
-                {
-                    pi.costType = CostTypeIndex.None;
-                    pi.cost = BALANCED_MODE;
-                    pi.GetComponent<HologramProjector>().displayDistance = 0f;
-                    self.GetComponent<HologramProjector>().displayDistance = 0f;
-                }
-                else
-                {
+
+
                     pi.costType = CostTypeIndex.Money;
-                    pi.cost = ResurrectionCost.Value;
-                }
+                    //pi.cost = ResurrectionCost.Value * useCount;
+                    pi.cost=GetDifficultyScaledCost(ResurrectionCost.Value);
+
 
 
             };
@@ -150,7 +149,7 @@ namespace ShrineOfEmpoweredDio
 
 
                 }
-                return orig(self, interactor);
+                return false;
             };
 
         }
@@ -173,19 +172,10 @@ namespace ShrineOfEmpoweredDio
         private void UpdateShrineDisplay(ShrineHealingBehavior self)
         {
             PurchaseInteraction pi = self.GetFieldValue<PurchaseInteraction>("purchaseInteraction");
-            if (clientCost == BALANCED_MODE)
-            {
-                pi.costType = CostTypeIndex.None;
-                pi.cost = BALANCED_MODE;
-                pi.GetComponent<HologramProjector>().displayDistance = 0f;
-                self.GetComponent<HologramProjector>().displayDistance = 0f;
 
-            }
-            else
-            {
                 pi.costType = CostTypeIndex.Money;
-                pi.cost = clientCost;
-            }
+                pi.cost = GetDifficultyScaledCost(clientCost);//clientCost*useCount;
+
         }
 
         private int GetDifficultyScaledCost(int baseCost)
