@@ -149,7 +149,8 @@ namespace ShrineOfEmpoweredDio
 
 
                 }
-                return false;
+                                        return orig(self, interactor);
+
             };
 
         }
