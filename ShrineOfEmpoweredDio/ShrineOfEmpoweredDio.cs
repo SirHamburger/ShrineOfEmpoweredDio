@@ -11,10 +11,10 @@ using System.Linq;
 using R2API.Utils;
 using RoR2.Networking;
 
-namespace ShrineOfDio
+namespace ShrineOfEmpoweredDio
 {
     [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.MagnusMagnuson.ShrineOfDio", "ShrineOfDio", "1.3.2")]
+    [BepInPlugin("com.MagnusMagnuson.ShrineOfEmpoweredDio", "ShrineOfEmpoweredDio", "1.3.2")]
     public class ShrineOfDio : BaseUnityPlugin
     {
 
