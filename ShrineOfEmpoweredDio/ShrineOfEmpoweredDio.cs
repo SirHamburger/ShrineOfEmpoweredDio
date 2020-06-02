@@ -50,6 +50,11 @@ namespace ShrineOfEmpoweredDio
 
             On.RoR2.ShrineHealingBehavior.FixedUpdate += (orig, self) =>
             {
+                if(RoR2.SceneInfo.instance.sceneDef.stageOrder != 5)
+                {
+                    orig(self);
+                    return;
+                }
                 orig(self);
 
                 if (clientCost == UNINITIALIZED)
@@ -89,6 +94,11 @@ namespace ShrineOfEmpoweredDio
 
             On.RoR2.ShrineHealingBehavior.Awake += (orig, self) =>
             {
+                if(RoR2.SceneInfo.instance.sceneDef.stageOrder != 5)
+                {
+                    orig(self);
+                    return;
+                }
                 orig(self);
 
                 PurchaseInteraction pi = self.GetFieldValue<PurchaseInteraction>("purchaseInteraction");
@@ -110,8 +120,12 @@ namespace ShrineOfEmpoweredDio
 
             On.RoR2.ShrineHealingBehavior.AddShrineStack += (orig, self, interactor) =>
             {
-
-                string resurrectionMessage = $"<color=#beeca1>{interactor.GetComponent<CharacterBody>().GetUserName()}</color> resurrected <color=#beeca1>Dio Shrine</color>";
+                if(RoR2.SceneInfo.instance.sceneDef.stageOrder != 5)
+                {
+                    orig(self,interactor);
+                    return;
+                }
+                string resurrectionMessage = $"<color=#beeca1>{interactor.GetComponent<CharacterBody>().GetUserName()}</color> reused a <color=#beeca1>Dio</color>";
                 Chat.SendBroadcastChat(new Chat.SimpleChatMessage
                 {
                     baseToken = resurrectionMessage
@@ -172,10 +186,14 @@ namespace ShrineOfEmpoweredDio
 
         private void UpdateShrineDisplay(ShrineHealingBehavior self)
         {
+            if(RoR2.SceneInfo.instance.sceneDef.stageOrder != 5)
+                {
+                    return;
+                }
             PurchaseInteraction pi = self.GetFieldValue<PurchaseInteraction>("purchaseInteraction");
 
                 pi.costType = CostTypeIndex.Money;
-                pi.cost = GetDifficultyScaledCost(clientCost);//clientCost*useCount;
+                pi.cost = GetDifficultyScaledCost(ResurrectionCost.Value);//clientCost*useCount;
 
         }
 
@@ -187,6 +205,10 @@ namespace ShrineOfEmpoweredDio
 
         public void SpawnShrineOfDio(SceneDirector self)
         {
+            if(RoR2.SceneInfo.instance.sceneDef.stageOrder != 5)
+                {
+                    return;
+                }
             Xoroshiro128Plus xoroshiro128Plus = new Xoroshiro128Plus(self.GetFieldValue<Xoroshiro128Plus>("rng").nextUlong);
             if (SceneInfo.instance.countsAsStage)
             {
