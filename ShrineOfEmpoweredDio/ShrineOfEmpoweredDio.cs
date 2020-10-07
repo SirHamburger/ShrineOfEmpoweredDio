@@ -14,12 +14,11 @@ using RoR2.Networking;
 namespace ShrineOfEmpoweredDio
 {
     [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.MagnusMagnuson.ShrineOfEmpoweredDio", "ShrineOfEmpoweredDio", "1.3.2")]
+    [BepInPlugin("com.SirHamburger.ShrineOfEmpoweredDio", "ShrineOfEmpoweredDio", "1.3.3")]
     public class ShrineOfDio : BaseUnityPlugin
     {
 
-        public static ConfigWrapper<bool> UseBalancedMode;
-        public static ConfigWrapper<int> ResurrectionCost;
+        public static int ResurrectionCost = 300;
 
         public const int UNINITIALIZED = -2;
 
@@ -33,7 +32,6 @@ namespace ShrineOfEmpoweredDio
 
         public void Awake()
         {
-            InitConfig();
 
 
             On.RoR2.SceneDirector.PopulateScene += (orig, self) =>
@@ -102,19 +100,16 @@ namespace ShrineOfEmpoweredDio
                 orig(self);
 
                 PurchaseInteraction pi = self.GetFieldValue<PurchaseInteraction>("purchaseInteraction");
-                pi.contextToken = "Offer to the Shrine of Dio";
-                pi.displayNameToken = "Shrine of Dio";
+                pi.contextToken = "Offer to the Shrine of empowered Dio";
+                pi.displayNameToken = "Shrine of empowered Dio";
                 self.costMultiplierPerPurchase = 4f;
 
 
-                isBalancedMode = UseBalancedMode.Value;
 
 
                     pi.costType = CostTypeIndex.Money;
                     //pi.cost = ResurrectionCost.Value * useCount;
-                    pi.cost=GetDifficultyScaledCost(ResurrectionCost.Value);
-
-
+                    pi.cost=GetDifficultyScaledCost(ResurrectionCost);
 
             };
 
@@ -125,7 +120,7 @@ namespace ShrineOfEmpoweredDio
                     orig(self,interactor);
                     return;
                 }
-                string resurrectionMessage = $"<color=#beeca1>{interactor.GetComponent<CharacterBody>().GetUserName()}</color> reused a <color=#beeca1>Dio</color>";
+                string resurrectionMessage = $"<color=#beeca1>{interactor.GetComponent<CharacterBody>().GetUserName()}</color> gained a <color=#beeca1>Dio</color>";
                 Chat.SendBroadcastChat(new Chat.SimpleChatMessage
                 {
                     baseToken = resurrectionMessage
@@ -153,35 +148,17 @@ namespace ShrineOfEmpoweredDio
 
             On.RoR2.PurchaseInteraction.CanBeAffordedByInteractor += (orig, self, interactor) =>
             {
-                if (self.displayNameToken.Contains("Shrine of Dio") || self.displayNameToken.Contains("SHRINE_HEALING"))
+                if (self.displayNameToken.Contains("Shrine of empowered Dio"))
                 {
                     if (interactor.GetComponent<CharacterBody>().inventory.GetItemCount(ItemIndex.ExtraLifeConsumed) > 0)
                     {
                         return orig(self, interactor);
                     }
-
-
-
+                    return false;
                 }
-                                        return orig(self, interactor);
-
+                return orig(self, interactor);
             };
 
-        }
-
-        private void InitConfig()
-        {
-            UseBalancedMode = Config.Wrap(
-            "Config",
-            "UseBalancedMode",
-            "Setting this to true will only allow you to resurrect other players for one of your Dio's Best Friend. Turning this off will allow you to instead use gold.",
-            false);
-
-            ResurrectionCost = Config.Wrap(
-            "Config",
-            "ResurrectionCost",
-            "[Only active if you set UseBalancedMode to false] Cost for a resurrection. Scales with difficulty but doesn't increase each usage. Regular Chest cost is 25, Golden/Legendary Chest is 400. Default is 300.",
-            300);
         }
 
         private void UpdateShrineDisplay(ShrineHealingBehavior self)
@@ -193,7 +170,7 @@ namespace ShrineOfEmpoweredDio
             PurchaseInteraction pi = self.GetFieldValue<PurchaseInteraction>("purchaseInteraction");
 
                 pi.costType = CostTypeIndex.Money;
-                pi.cost = GetDifficultyScaledCost(ResurrectionCost.Value);//clientCost*useCount;
+                pi.cost = GetDifficultyScaledCost(ResurrectionCost);//clientCost*useCount;
 
         }
 
@@ -219,11 +196,9 @@ namespace ShrineOfEmpoweredDio
                     placementMode = DirectorPlacementRule.PlacementMode.Random
                 }, xoroshiro128Plus));
 
-                if (!UseBalancedMode.Value)
-                {
-                    gameObject3.GetComponent<PurchaseInteraction>().Networkcost = GetDifficultyScaledCost(ResurrectionCost.Value);
+                    gameObject3.GetComponent<PurchaseInteraction>().Networkcost = GetDifficultyScaledCost(ResurrectionCost);
                 }
-            }
+            
         }
 
     }
