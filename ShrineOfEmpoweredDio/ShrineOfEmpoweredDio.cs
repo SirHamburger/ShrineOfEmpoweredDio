@@ -14,7 +14,7 @@ using RoR2.Networking;
 namespace ShrineOfEmpoweredDio
 {
     [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.SirHamburger.ShrineOfEmpoweredDio", "ShrineOfEmpoweredDio", "1.3.3")]
+    [BepInPlugin("com.SirHamburger.ShrineOfEmpoweredDio", "ShrineOfEmpoweredDio", "1.3.4")]
     public class ShrineOfDio : BaseUnityPlugin
     {
 
@@ -32,7 +32,6 @@ namespace ShrineOfEmpoweredDio
 
         public void Awake()
         {
-
 
             On.RoR2.SceneDirector.PopulateScene += (orig, self) =>
             {
@@ -89,7 +88,7 @@ namespace ShrineOfEmpoweredDio
                 }
 
             };
-
+            
             On.RoR2.ShrineHealingBehavior.Awake += (orig, self) =>
             {
                 if(RoR2.SceneInfo.instance.sceneDef.stageOrder != 5)
@@ -138,9 +137,9 @@ namespace ShrineOfEmpoweredDio
                 CharacterBody cb = interactor.GetComponent<CharacterBody>();
 
                 PurchaseInteraction pi = self.GetComponent<PurchaseInteraction>();
-                PurchaseInteraction.CreateItemTakenOrb(cb.corePosition, pi.gameObject, ItemIndex.ExtraLife);
-                cb.inventory.RemoveItem(ItemIndex.ExtraLifeConsumed, 1);
-                cb.inventory.GiveItem(ItemIndex.ExtraLife, 1);
+                PurchaseInteraction.CreateItemTakenOrb(cb.corePosition, pi.gameObject, RoR2.RoR2Content.Items.ExtraLife.itemIndex);
+                cb.inventory.RemoveItem(RoR2.RoR2Content.Items.ExtraLifeConsumed.itemIndex, 1);
+                cb.inventory.GiveItem(RoR2.RoR2Content.Items.ExtraLife.itemIndex, 1);
                 useCount++;
 
 
@@ -150,7 +149,7 @@ namespace ShrineOfEmpoweredDio
             {
                 if (self.displayNameToken.Contains("Shrine of empowered Dio"))
                 {
-                    if (interactor.GetComponent<CharacterBody>().inventory.GetItemCount(ItemIndex.ExtraLifeConsumed) > 0)
+                    if (interactor.GetComponent<CharacterBody>().inventory.GetItemCount(RoR2.RoR2Content.Items.ExtraLifeConsumed) > 0)
                     {
                         return orig(self, interactor);
                     }
@@ -186,6 +185,7 @@ namespace ShrineOfEmpoweredDio
                 {
                     return;
                 }
+            
             Xoroshiro128Plus xoroshiro128Plus = new Xoroshiro128Plus(self.GetFieldValue<Xoroshiro128Plus>("rng").nextUlong);
             if (SceneInfo.instance.countsAsStage)
             {
